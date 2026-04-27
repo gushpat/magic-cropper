@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recortador E-commerce 1200x1200</title>
+    
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f8f9fa; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 720px; 
+            text-align: center; 
+        }
+        
+        .img-wrapper { 
+            position: relative;
+            width: 100%; 
+            height: 520px; 
+            margin: 25px 0; 
+            background: #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #dee2e6;
+        }
+
+        #image-preview { 
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 auto;
+        }
+
+        .btn-save { 
+            padding: 15px 40px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-save:hover { 
+            background: #0056b3; 
+            transform: translateY(-2px); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Magic Cropper</h2>
+        <p>Selecione a imagem e ajuste o quadrado para o recorte ideal.</p>
+        
+        <input type="file" id="file-input" accept="image/*">
+        
+        <div class="img-wrapper">
+            <img id="image-preview" alt="Preview da imagem">
+        </div>
+
+        <button id="save-button" class="btn-save">Salvar e Baixar (1200×1200)</button>
+    </div>
+
+    <!-- Cropper.js - Usando versão 1.6.2 (mais estável para testes locais) -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    
+    <script>
+    const fileInput = document.getElementById('file-input');
+    const image = document.getElementById('image-preview');
+    const saveButton = document.getElementById('save-button');
+    let cropper = null;
+    let originalFileName = '';   // ← Nova variável para guardar o nome original
+
+    function destroyCropper() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Guarda o nome original da imagem (sem extensão)
+        originalFileName = file.name.replace(/\.[^/.]+$/, ""); 
+
+        destroyCropper();
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            image.src = '';
+
+            image.onload = () => {
+                console.log('✅ Imagem carregada:', image.naturalWidth + 'x' + image.naturalHeight);
+
+                if (typeof Cropper === 'undefined') {
+                    alert('Erro: Biblioteca Cropper não carregou. Verifique sua conexão.');
+                    return;
+                }
+
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 2,
+                    dragMode: 'move',
+                    autoCropArea: 0.9,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: true,
+                    background: true,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    minContainerWidth: 300,
+                    minContainerHeight: 300,
+
+                    ready() {
+                        console.log('✅ Cropper inicializado com sucesso!');
+                        cropper.crop();
+                    }
+                });
+            };
+
+            image.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    saveButton.addEventListener('click', () => {
+        if (!cropper) {
+            alert("Por favor, selecione uma imagem primeiro.");
+            return;
+        }
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 1200,
+            height: 1200,
+            imageSmoothingQuality: 'high'
+        });
+
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                alert("Erro ao gerar a imagem.");
+                return;
+            }
+
+            // Nome do arquivo personalizado
+            const downloadFileName = originalFileName 
+                ? `${originalFileName}-foto-produto-1200x1200.jpg` 
+                : 'foto-produto-1200x1200.jpg';
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = downloadFileName;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        }, 'image/jpeg', 0.92);
+    });
+</script>
+</body>
+</html>
