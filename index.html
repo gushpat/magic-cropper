@@ -3,175 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recortador E-commerce 1200x1200</title>
+    <title>Magic Cropper by Gustavo Patricio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <!-- Cropper.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
-
+    
+    <!-- Stars Animation CSS -->
+    <link rel="stylesheet" href="stars.css">
+    
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #f8f9fa; 
-            display: flex; 
-            justify-content: center; 
-            padding: 20px; 
-        }
-        .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 720px; 
-            text-align: center; 
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 520px;
+            background: #0f172a;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid #334155;
         }
         
-        .img-wrapper { 
-            position: relative;
-            width: 100%; 
-            height: 520px; 
-            margin: 25px 0; 
-            background: #e9ecef;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid #dee2e6;
-        }
-
-        #image-preview { 
+        #image-preview {
             display: block;
             max-width: 100%;
             max-height: 100%;
             margin: 0 auto;
         }
-
-        .btn-save { 
-            padding: 15px 40px; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 18px; 
-            font-weight: 600; 
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-save:hover { 
-            background: #0056b3; 
-            transform: translateY(-2px); 
-        }
     </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
-    <div class="card">
-        <h2>Magic Cropper</h2>
-        <p>Selecione a imagem e ajuste o quadrado para o recorte ideal.</p>
-        
-        <input type="file" id="file-input" accept="image/*">
-        
-        <div class="img-wrapper">
-            <img id="image-preview" alt="Preview da imagem">
-        </div>
-
-        <button id="save-button" class="btn-save">Salvar e Baixar (1200×1200)</button>
+    <!-- Background de estrelas -->
+    <div class="stars-bg">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
     </div>
 
-    <!-- Cropper.js - Usando versão 1.6.2 (mais estável para testes locais) -->
+    <div class="max-w-xl w-full mx-auto mt-8 md:mt-12 relative z-10">
+        
+        <!-- Card principal -->
+        <div class="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-700">
+            
+            <!-- Header com logo -->
+            <div class="px-6 py-6 border-b border-zinc-700 flex flex-col items-center gap-3">
+                <!-- Logotipo -->
+                <div class="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+                    <span class="text-4xl">✂️</span>
+                </div>
+                
+                <div class="text-center">
+                    <h1 class="text-3xl font-bold tracking-tight">Magic Cropper</h1>
+                    <p class="text-zinc-400 mt-1">Ferramenta para recorte de fotos quadradas de e-commerce</p>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8 space-y-8">
+                
+                <!-- Upload Area -->
+                <div class="flex justify-center">
+                    <label id="upload-label" 
+                           class="cursor-pointer bg-zinc-800 hover:bg-zinc-700 transition-all border-2 border-dashed border-zinc-600 rounded-3xl px-10 py-14 w-full text-center group">
+                        <div class="mx-auto w-20 h-20 bg-zinc-700 group-hover:bg-blue-600/20 transition-colors rounded-3xl flex items-center justify-center mb-5 text-5xl">
+                            📸
+                        </div>
+                        <p class="font-semibold text-xl">Clique ou arraste sua foto</p>
+                        <p class="text-zinc-500 text-sm mt-2">PNG, JPG ou JPEG</p>
+                        <input type="file" id="file-input" accept="image/*" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Área do Cropper -->
+                <div id="crop-area" class="hidden space-y-6">
+                    <div class="img-wrapper mx-auto shadow-inner">
+                        <img id="image-preview" alt="Preview da imagem">
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button id="reset-button"
+                                class="flex-1 bg-zinc-800 hover:bg-zinc-700 font-medium py-4 rounded-2xl transition-colors">
+                            Escolher outra foto
+                        </button>
+                        <button id="save-button"
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-semibold py-4 rounded-2xl transition-all active:scale-[0.98]">
+                            Baixar foto 1200×1200
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-zinc-950 px-6 py-5 text-center text-xs text-zinc-500 border-t border-zinc-800">
+                A imagem será salva como: 
+                <span class="text-emerald-400 font-medium" id="filename-preview">(nome-da-foto) + foto-produto-1200x1200.jpg</span>
+
+                <hr style="margin: 10px;">
+
+                Desenvolvido com ❤️ por Gustavo Patricio
+            </div>
+
+            
+        </div>
+    </div>
+
+    <!-- Cropper.js -->
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     
     <script>
-    const fileInput = document.getElementById('file-input');
-    const image = document.getElementById('image-preview');
-    const saveButton = document.getElementById('save-button');
-    let cropper = null;
-    let originalFileName = '';   // ← Nova variável para guardar o nome original
+        // === Todo o JavaScript permanece igual ao anterior ===
+        const fileInput = document.getElementById('file-input');
+        const image = document.getElementById('image-preview');
+        const saveButton = document.getElementById('save-button');
+        const resetButton = document.getElementById('reset-button');
+        const cropArea = document.getElementById('crop-area');
+        const uploadLabel = document.getElementById('upload-label');
+        const filenamePreview = document.getElementById('filename-preview');
 
-    function destroyCropper() {
-        if (cropper) {
-            cropper.destroy();
-            cropper = null;
+        let cropper = null;
+        let originalFileName = '';
+
+        function destroyCropper() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
-    }
 
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Guarda o nome original da imagem (sem extensão)
-        originalFileName = file.name.replace(/\.[^/.]+$/, ""); 
-
-        destroyCropper();
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
+        function resetUI() {
+            destroyCropper();
+            cropArea.classList.add('hidden');
+            uploadLabel.classList.remove('hidden');
             image.src = '';
-
-            image.onload = () => {
-                console.log('✅ Imagem carregada:', image.naturalWidth + 'x' + image.naturalHeight);
-
-                if (typeof Cropper === 'undefined') {
-                    alert('Erro: Biblioteca Cropper não carregou. Verifique sua conexão.');
-                    return;
-                }
-
-                cropper = new Cropper(image, {
-                    aspectRatio: 1,
-                    viewMode: 2,
-                    dragMode: 'move',
-                    autoCropArea: 0.9,
-                    restore: false,
-                    guides: true,
-                    center: true,
-                    highlight: true,
-                    background: true,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    minContainerWidth: 300,
-                    minContainerHeight: 300,
-
-                    ready() {
-                        console.log('✅ Cropper inicializado com sucesso!');
-                        cropper.crop();
-                    }
-                });
-            };
-
-            image.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    saveButton.addEventListener('click', () => {
-        if (!cropper) {
-            alert("Por favor, selecione uma imagem primeiro.");
-            return;
+            originalFileName = '';
         }
 
-        const canvas = cropper.getCroppedCanvas({
-            width: 1200,
-            height: 1200,
-            imageSmoothingQuality: 'high'
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            originalFileName = file.name.replace(/\.[^/.]+$/, "");
+            filenamePreview.textContent = `${originalFileName}-foto-produto-1200x1200.jpg`;
+
+            uploadLabel.classList.add('hidden');
+            cropArea.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                image.src = '';
+
+                image.onload = () => {
+                    if (typeof Cropper === 'undefined') {
+                        alert('Erro ao carregar o recortador.');
+                        return;
+                    }
+
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        dragMode: 'move',
+                        autoCropArea: 0.9,
+                        guides: true,
+                        center: true,
+                        highlight: true,
+                        background: true,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        minContainerWidth: 280,
+                        minContainerHeight: 280,
+
+                        ready() {
+                            cropper.crop();
+                        }
+                    });
+                };
+                image.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         });
 
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                alert("Erro ao gerar a imagem.");
-                return;
-            }
+        saveButton.addEventListener('click', () => {
+            if (!cropper) return;
 
-            // Nome do arquivo personalizado
-            const downloadFileName = originalFileName 
-                ? `${originalFileName}-foto-produto-1200x1200.jpg` 
-                : 'foto-produto-1200x1200.jpg';
+            const canvas = cropper.getCroppedCanvas({
+                width: 1200,
+                height: 1200,
+                imageSmoothingQuality: 'high'
+            });
 
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = downloadFileName;
-            link.href = url;
-            link.click();
-            URL.revokeObjectURL(url);
-        }, 'image/jpeg', 0.92);
-    });
-</script>
+            canvas.toBlob((blob) => {
+                const downloadName = originalFileName 
+                    ? `${originalFileName}-foto-produto-1200x1200.jpg` 
+                    : 'foto-produto-1200x1200.jpg';
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = downloadName;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.92);
+        });
+
+        resetButton.addEventListener('click', resetUI);
+    </script>
 </body>
 </html>
